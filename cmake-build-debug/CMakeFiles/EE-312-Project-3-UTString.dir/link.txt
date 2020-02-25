@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/EE-312-Project-3-UTString.dir/main.cpp.o CMakeFiles/EE-312-Project-3-UTString.dir/Project3.cpp.o  -o EE-312-Project-3-UTString 
