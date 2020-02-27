@@ -48,28 +48,18 @@ UTString* utstrdup(const char* src) {
     uint32_t len = lengthOf(src);
     uint32_t cap = len;
     uint32_t i;
-    UTString *out = (UTString*) malloc(1 * sizeof(UTString));
-    out -> length = len;
-    out -> capacity = cap;
+    UTString *s = (UTString*) malloc(1 * sizeof(UTString));
+    s -> length = len;
+    s -> capacity = cap;
     char *ptr =  (char*) malloc(len + 5);
     for(i = 0; i < len; i++) {
         ptr[i] = src[i];
     }
-
-
     i++;
     ptr[i] = 0;
-//    *(uint32_t*)( out->string + out->length + 1 ) = SIGNATURE;
-//    i++;
-//    ptr[i] = (char) 0xde;
-//    i++;
-//    ptr[i] = (char) 0xad;
-//    i++;
-//    ptr[i] = (char) 0xbe;
-//    i++;
-//    ptr[i] = (char) 0xef;
-    out -> string = ptr;
-    return out;
+    s -> string = ptr;
+    CHECK(s) = SIGNATURE;
+    return s;
 }
 
 /*
@@ -77,12 +67,8 @@ UTString* utstrdup(const char* src) {
  *  s must be a valid UTString.
  */
 uint32_t utstrlen(const UTString* s) {
-    if(isOurs(s)) {
-        return s->length;
-    }
-    else {
-        return -1; // TODO: Find the real value you return;
-    }
+    assert(isOurs(s));
+    return s->length;
 }
 
 /*
@@ -92,34 +78,31 @@ uint32_t utstrlen(const UTString* s) {
  *  as will actually fit in s.
  * Update the length of s.
  * Return s with the above changes. */
-UTString* utstrcat(UTString* s, const char* suffix) { // TODO: Make it an actual UTString
-//    if(!isOurs(s)) {
-//        return s;
-//    }
+UTString* utstrcat(UTString* s, const char* suffix) {
+    //assert(isOurs(s));
     char* str = s->string;
-    uint32_t i = 0;
-    while((i + s->length < s->capacity) && (suffix[i] != 0)) {
-        str[i+s->length] = suffix[i];
+    uint32_t i = s->length;
+    while((i < s->capacity) && (suffix[i - s->length] != 0)) {
+        str[i] = suffix[i-s->length];
         i++;
     }
-    s->length += i;
+    s->length = i;
     s->string = str;
+    //CHECK(s) = SIGNATURE;
     return s;
 }
 
 /*
  * Copy src into dst.
- *  dst must be a valid UTString.
+ *  dst must be a validout -> string = ptr; UTString.
  *  src is an ordinary string.
  * Do not allocate any additional storage: only copy as many characters
  *  as will actually fit in dst.
  * Update the length of dst.
  * Return dst with the above changes.
  */
-UTString* utstrcpy(UTString* dst, const char* src) { // TODO: Make it an actualy utstring
-//    if(!isOurs(dst)) {
-//        return dst;
-//    }
+UTString* utstrcpy(UTString* dst, const char* src) {
+    assert(isOurs(dst));
     char* str = dst->string;
     uint32_t strLen = 0;
     while(str[strLen] != 0 && src[strLen] != 0) {
@@ -148,6 +131,7 @@ UTString* utstrcpy(UTString* dst, const char* src) { // TODO: Make it an actualy
         dst->length = strLen;
     }
     dst->string = str;
+    assert(isOurs(dst));
     return dst;
 }
 
@@ -155,6 +139,7 @@ UTString* utstrcpy(UTString* dst, const char* src) { // TODO: Make it an actualy
  * Free all memory associated with the given UTString.
  */
 void utstrfree(UTString* self) {
+    //assert(isOurs(self));
     free(self->string);
     free(self);
 }
@@ -169,6 +154,7 @@ void utstrfree(UTString* self) {
  * Return s with the above changes.
  */
 UTString* utstrrealloc(UTString* s, uint32_t new_capacity) {
+    assert(isOurs(s));
     if (new_capacity <= (s->capacity)) {
         return s;
     } else {
@@ -178,9 +164,10 @@ UTString* utstrrealloc(UTString* s, uint32_t new_capacity) {
             new_str[i] = old_str[i];
         }
         s->string = new_str;
+        CHECK(s) = SIGNATURE;
         s->capacity = new_capacity;
         free((void *) old_str);
+        assert(isOurs(s));
         return s;
     }
 }
-
