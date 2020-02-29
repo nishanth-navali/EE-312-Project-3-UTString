@@ -167,7 +167,6 @@ UTString* utstrrealloc(UTString* s, uint32_t new_capacity) {
         CHECK(s) = SIGNATURE;
         s->capacity = new_capacity;
         free((void *) old_str);
-        assert(isOurs(s));
         return s;
     }
 }
