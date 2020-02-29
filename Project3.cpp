@@ -79,7 +79,7 @@ uint32_t utstrlen(const UTString* s) {
  * Update the length of s.
  * Return s with the above changes. */
 UTString* utstrcat(UTString* s, const char* suffix) {
-    //assert(isOurs(s));
+    assert(isOurs(s));
     char* str = s->string;
     uint32_t i = s->length;
     while((i < s->capacity) && (suffix[i - s->length] != 0)) {
@@ -87,8 +87,9 @@ UTString* utstrcat(UTString* s, const char* suffix) {
         i++;
     }
     s->length = i;
+    str[s->length] = 0;
     s->string = str;
-    //CHECK(s) = SIGNATURE;
+    CHECK(s) = SIGNATURE;
     return s;
 }
 
@@ -131,15 +132,16 @@ UTString* utstrcpy(UTString* dst, const char* src) {
         dst->length = strLen;
     }
     dst->string = str;
-    assert(isOurs(dst));
-    return dst;
+    UTString* s = dst;
+    CHECK(s) = SIGNATURE;
+    return s;
 }
 
 /*
  * Free all memory associated with the given UTString.
  */
 void utstrfree(UTString* self) {
-    //assert(isOurs(self));
+    assert(isOurs(self));
     free(self->string);
     free(self);
 }
@@ -163,6 +165,7 @@ UTString* utstrrealloc(UTString* s, uint32_t new_capacity) {
         for(uint32_t i = 0; i < lengthOf(old_str); i++) {
             new_str[i] = old_str[i];
         }
+        new_str[lengthOf(old_str)] = 0;
         s->string = new_str;
         CHECK(s) = SIGNATURE;
         s->capacity = new_capacity;
